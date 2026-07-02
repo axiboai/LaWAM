@@ -1006,15 +1006,16 @@ class AgilexDataConfig:
                 apply_to=self.state_keys,
                 normalization_modes={
                     "state.left_joints": "min_max",
-                    "state.left_gripper": "binary",
+                    # Gripper is a continuous opening in METERS (~0..0.10). The old
+                    # `binary` mode with threshold 0.49 was degenerate here: every
+                    # gripper value is < 0.49, so (x > 0.49) is always False and the
+                    # normalized gripper collapsed to a constant. Use min_max so the
+                    # gripper carries real signal (also flips its stats mask to True).
+                    "state.left_gripper": "min_max",
                     "state.right_joints": "min_max",
-                    "state.right_gripper": "binary",
+                    "state.right_gripper": "min_max",
                 },
-                invert_normalized_keys=[
-                    "state.left_gripper",
-                    "state.right_gripper",
-                ],
-                binary_threshold=0.49,
+                invert_normalized_keys=[],
             ),
             # action transforms
             StateActionToTensor(apply_to=self.action_keys),
@@ -1022,15 +1023,15 @@ class AgilexDataConfig:
                 apply_to=self.action_keys,
                 normalization_modes={
                     "action.left_joints": "min_max",
-                    "action.left_gripper": "binary",
+                    # See the state block: gripper is continuous meters, so `binary`
+                    # @0.49 was degenerate. min_max makes it learnable and sets its
+                    # action stats `mask` True, so the policy server unnormalizes the
+                    # gripper straight to meters (no adapter remap needed).
+                    "action.left_gripper": "min_max",
                     "action.right_joints": "min_max",
-                    "action.right_gripper": "binary",
+                    "action.right_gripper": "min_max",
                 },
-                invert_normalized_keys=[
-                    "action.left_gripper",
-                    "action.right_gripper",
-                ],
-                binary_threshold=0.49,
+                invert_normalized_keys=[],
             ),
         ]
 
