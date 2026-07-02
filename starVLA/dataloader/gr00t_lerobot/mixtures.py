@@ -95,6 +95,11 @@ DATASET_NAMED_MIXTURES = {
     "agilex_joint": [
         ("robomind_agilex_3rgb", 1.0, "robotwin_joint"),
     ],
+    "piper_stacking_v3": [
+        # dataset folder under data_root_dir; "agilex" -> AgilexDataConfig (joint,
+        # 14-dim [qL6,gripL,qR6,gripR]) with the fixed min_max gripper normalization.
+        ("piper_stacking_v3", 1.0, "agilex"),
+    ],
     "robotwin_eef": [
         ("robotwin_eef_all_v30/robotwin_eef_all_v30_merged", 1.0, "robotwin_eef"),
     ],
