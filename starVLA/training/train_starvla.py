@@ -279,15 +279,17 @@ class VLATrainer(TrainerUtils):
             return
         if self.accelerator.is_main_process:
             try:
-                # Force offline logging whenever wandb is enabled.
-                os.environ["WANDB_MODE"] = "offline"
+                wandb_mode = str(os.environ.get("WANDB_MODE", "offline")).lower()
+                if wandb_mode not in {"online", "offline", "disabled"}:
+                    wandb_mode = "offline"
+                os.environ["WANDB_MODE"] = wandb_mode
                 wandb.init(
                     name=Path(self.config.output_dir).name,
                     dir=os.path.join(self.config.output_dir, "wandb"),
                     project=self.config.wandb_project,
                     entity=self.config.wandb_entity,
                     group="vla-train",
-                    mode="offline",
+                    mode=wandb_mode,
                 )
             except Exception as e:
                 self.use_wandb = False
